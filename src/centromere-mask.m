@@ -16,9 +16,6 @@
 ## along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 pkg load image;
-pkg load bioformats;
-
-bfInitLogging ("WARN");
 
 function [centromere_mask] = get_centromeres (im, nuclei_mask)
   if (! isinteger (im))
@@ -53,8 +50,8 @@ function [rv] = main (argv)
   endif
 
   nuclei_mask = imread (nuclei_mask_fpath, "index", "all");
-  centromeres = imread_dv (img_fpath, centromere_channel);
-  if (! size_equal (dapi_mask, foci))
+  centromeres = read_dv_channel (img_fpath, centromere_channel);
+  if (! size_equal (nuclei_mask, centromeres))
     error ("centromere-mask: NUCLEI_MASK and IMG are images of different sizes");
   endif
 

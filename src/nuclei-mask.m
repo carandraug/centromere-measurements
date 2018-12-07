@@ -15,10 +15,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-pkg load bioformats;
 pkg load image;
-
-bfInitLogging ("WARN");
 
 function mask = get_dapi_mask (dapi)
   se_2d = strel ("disk", 3, 0);
@@ -51,7 +48,7 @@ function [rv] = main (argv)
     error ("nucleus_mask: DAPI_CHANNEL must be an integer");
   endif
 
-  dapi = imread_dv (in_fpath, dapi_channel);
+  dapi = read_dv_channel (in_fpath, dapi_channel);
   mask = get_dapi_mask (dapi);
 
   imwrite (mask, mask_fpath);
