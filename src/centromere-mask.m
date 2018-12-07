@@ -24,12 +24,12 @@ function [centromere_mask] = get_centromeres (im, nuclei_mask)
     error ("data is not integer class");
   endif
 
-  bw = im2bw (im, graythresh (im(nuclei_mask)));
+  bw = im2bw (im, graythresh_triangle (im(nuclei_mask)));
   im(! bw | ! nuclei_mask) = 0;
   imc = imcomplement (im);
   w_lines = ! watershed (imc);
   im(w_lines) = 0;
-  centromere_mask = bwareaopen (logical (im), 10);
+  centromere_mask = bwareaopen (logical (im), 5);
 endfunction
 
 function [rv] = main (argv)
