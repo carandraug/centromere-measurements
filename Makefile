@@ -43,10 +43,28 @@ nuclei_mask: $(NUCLEI_MASK_FILES)
 
 centromere_mask: $(CENTROMERE_MASK_FILES)
 
-%-nuclei-mask.tif: %.dv
-	$(OCTAVE) $(OCTAVE_FLAGS) src/nuclei-mask.m \
-	  $(NUCLEI_CHANNEL) $^ $@
 
-%-centromere-mask.tif: %-nuclei-mask.tif %.dv
-	$(OCTAVE) $(OCTAVE_FLAGS) src/centromere-mask.m \
-	  $(CENTROMERE_CHANNEL) $^ $@
+## Functions used by our scripts are their prerequesites so that
+## results dependent on them get re-analysed.
+
+READ_DV_CHANNEL_DEPS := \
+  lib-octave/imread_dv.m
+
+CENTROMERE_MASK_SCRIPT := \
+  src/centromere-mask.m \
+  lib-octave/graythresh_triangle.m \
+  lib-octave/read_dv_channel.m \
+  $(READ_DV_CHANNEL_DEPS)
+
+NUCLEI_MASK_SCRIPT := \
+  src/nuclei-mask.m \
+  lib-octave/read_dv_channel.m \
+  $(READ_DV_CHANNEL_DEPS)
+
+%-nuclei-mask.tif: $(NUCLEI_MASK_SCRIPT) %.dv
+	$(OCTAVE) $(OCTAVE_FLAGS) $< \
+	  $(NUCLEI_CHANNEL) $*.dv $@
+
+%-centromere-mask.tif: $(CENTROMERE_MASK_SCRIPT) %-nuclei-mask.tif %.dv
+	$(OCTAVE) $(OCTAVE_FLAGS) $< \
+	  $(CENTROMERE_CHANNEL) $*-nuclei-mask.tif $*.dv $@
